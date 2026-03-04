@@ -54,4 +54,10 @@ tasks.named('run') {
     dependsOn 'installPlaywright'
     systemProperties System.getProperties()
     environment System.getenv()
+    jvmArgs = ['-Djava.locale.providers=COMPAT,CLDR']
+}
+
+tasks.register('installPlaywrightDeps', Exec) {
+    commandLine 'sh', '-c', 'npx playwright install-deps chromium 2>/dev/null || true'
+    ignoreExitValue = true
 }
