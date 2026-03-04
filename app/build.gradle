@@ -47,7 +47,7 @@ tasks.named('test') {
 tasks.register('installPlaywright', JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'com.microsoft.playwright.CLI'
-    args = ['install', '--with-deps', 'chromium']
+    args = ['install', 'chromium']
 }
 
 tasks.named('run') {
