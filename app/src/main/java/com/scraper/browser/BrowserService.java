@@ -34,7 +34,12 @@ public class BrowserService implements AutoCloseable {
                         .setHeadless(headless)
                         .setArgs(List.of(
                                 "--disable-blink-features=AutomationControlled",
-                                "--no-sandbox"
+                                "--no-sandbox",
+                                "--disable-setuid-sandbox",
+                                "--disable-dev-shm-usage",
+                                "--disable-gpu",
+                                "--disable-extensions",
+                                "--single-process"
                         ))
         );
         this.context = browser.newContext(
