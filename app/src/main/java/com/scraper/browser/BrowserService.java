@@ -109,7 +109,13 @@ public class BrowserService implements AutoCloseable {
     }
 
     public String screenshot(String filename) {
-        Path path = Paths.get("artifacts", filename);
+        Path dir = Paths.get(System.getProperty("user.dir"), "artifacts");
+        try {
+            java.nio.file.Files.createDirectories(dir);
+        } catch (java.io.IOException e) {
+            LOG.warn("Could not create artifacts directory: {}", e.getMessage());
+        }
+        Path path = dir.resolve(filename);
         page.screenshot(new Page.ScreenshotOptions()
                 .setPath(path)
                 .setFullPage(true));
