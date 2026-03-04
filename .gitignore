@@ -1,0 +1,25 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.project
+.settings/
+.classpath
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Artifacts (generated at runtime)
+artifacts/*.json
+artifacts/*.txt
+artifacts/*.png
+
+# Environment
+.env
+app/bin/
