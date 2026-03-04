@@ -1,6 +1,7 @@
 package com.scraper;
 
 import com.scraper.agent.ScraperAgent;
+import com.scraper.web.WebServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,8 +15,9 @@ import java.time.format.DateTimeFormatter;
 /**
  * Main entry point for the LangChain4j Web Scraper Agent.
  *
- * Demonstrates scraping article titles from Hacker News (news.ycombinator.com),
- * which allows scraping per its robots.txt.
+ * Supports two modes:
+ *   - CLI mode (default): Scrapes Hacker News and saves results to artifacts/
+ *   - Web mode (--web):   Starts a web UI on http://localhost:8080
  */
 public class App {
 
@@ -32,6 +34,18 @@ public class App {
 
         String model = System.getenv().getOrDefault("OPENAI_MODEL", "gpt-4o-mini");
 
+        // Check for --web flag
+        boolean webMode = false;
+        int port = 8080;
+        for (int i = 0; i < args.length; i++) {
+            if ("--web".equals(args[i])) {
+                webMode = true;
+            } else if ("--port".equals(args[i]) && i + 1 < args.length) {
+                port = Integer.parseInt(args[i + 1]);
+                i++;
+            }
+        }
+
         // Ensure artifacts directory exists
         try {
             Files.createDirectories(Paths.get("artifacts"));
@@ -39,6 +53,40 @@ public class App {
             LOG.warn("Could not create artifacts directory: {}", e.getMessage());
         }
 
+        if (webMode) {
+            runWebMode(apiKey, model, port);
+        } else {
+            runCliMode(apiKey, model);
+        }
+    }
+
+    private static void runWebMode(String apiKey, String model, int port) {
+        LOG.info("=== LangChain4j Web Scraper Agent - Web UI Mode ===");
+        try {
+            WebServer server = new WebServer(port, apiKey, model);
+            server.start();
+            System.out.println();
+            System.out.println("  Web UI is running at: http://localhost:" + port);
+            System.out.println("  Press Ctrl+C to stop.");
+            System.out.println();
+
+            // Shutdown hook for clean exit
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                LOG.info("Shutting down web server...");
+                server.stop();
+            }));
+
+            // Keep main thread alive
+            Thread.currentThread().join();
+        } catch (IOException e) {
+            LOG.error("Failed to start web server: {}", e.getMessage(), e);
+            System.exit(1);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private static void runCliMode(String apiKey, String model) {
         LOG.info("=== LangChain4j Web Scraper Agent Demo ===");
         LOG.info("Target: Hacker News (https://news.ycombinator.com)");
         LOG.info("Model: {}", model);

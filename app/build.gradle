@@ -56,3 +56,14 @@ tasks.named('run') {
     environment System.getenv()
     jvmArgs = ['-Djava.locale.providers=COMPAT,CLDR']
 }
+
+tasks.register('runWeb', JavaExec) {
+    dependsOn 'installPlaywright'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.scraper.App'
+    args = ['--web']
+    systemProperties System.getProperties()
+    environment System.getenv()
+    jvmArgs = ['-Djava.locale.providers=COMPAT,CLDR']
+    standardInput = System.in
+}
